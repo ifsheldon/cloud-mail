@@ -198,7 +198,7 @@ jobs:
           
           WORKER_URL="${CUSTOM_DOMAIN:-${{ steps.deploy.outputs.worker_url }}}"
 
-          HTTP_CODE=$(curl -sL -w "%{http_code}" -o response.txt \
+          HTTP_CODE=$(curl -sL --post301 --post302 --post303 -w "%{http_code}" -o response.txt \
             -X POST \
             -H "Content-Type: application/json" \
             -d "{\"domainList\": $DOMAIN,\"accountId\":\"$CLOUDFLARE_ACCOUNT_ID\",\"token\":\"$CLOUDFLARE_API_TOKEN\",\"workerName\":\"$NAME\"}" \
