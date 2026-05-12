@@ -26,7 +26,7 @@ jobs:
       R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME || vars.R2_BUCKET_NAME }}
       PROJECT_LINK: ${{ secrets.PROJECT_LINK || vars.PROJECT_LINK }}
       AI_MODEL: ${{ secrets.AI_MODEL || vars.AI_MODEL || '@cf/meta/llama-3.1-8b-instruct' }}
-      CF_EMAIL: ${{ secrets.CF_EMAIL || vars.CF_EMAIL || false }}
+      ENABLE_CF_EMAIL: ${{ secrets.CF_EMAIL || vars.CF_EMAIL || false }}
       ANALYSIS_CACHE: ${{ secrets.ANALYSIS_CACHE || vars.ANALYSIS_CACHE || false }}
       LINUXDO_CLIENT_ID: ${{ secrets.LINUXDO_CLIENT_ID || vars.LINUXDO_CLIENT_ID }}
       LINUXDO_CLIENT_SECRET: ${{ secrets.LINUXDO_CLIENT_SECRET || vars.LINUXDO_CLIENT_SECRET }}
@@ -115,7 +115,7 @@ jobs:
             sed -i '/\[\[routes\]\]/,/^$/d' "$CONFIG_FILE"
           fi
           
-          if [ "$(printf '%s' "$CF_EMAIL" | tr '[:upper:]' '[:lower:]')" = "true" ]; then
+          if [ "$(printf '%s' "$ENABLE_CF_EMAIL" | tr '[:upper:]' '[:lower:]')" = "true" ]; then
             cat >> "$CONFIG_FILE" <<'EOF'
 
           [[send_email]]
@@ -153,15 +153,14 @@ jobs:
           
           echo "🔍 Checking if the database exists..."
           
-          set +e
-            KV_LIST=$(pnpm wrangler kv namespace list 2>&1)
-            STATUS=$?
-          set -e
-          
-          if [ $STATUS -ne 0 ]; then
-            echo "$KV_LIST"
+          ERROR_LOG=$(mktemp)
+          if ! KV_LIST=$(pnpm wrangler kv namespace list 2>"$ERROR_LOG"); then
+            cat "$ERROR_LOG" >&2
+            rm -f "$ERROR_LOG"
             exit 1
           fi
+          cat "$ERROR_LOG" >&2
+          rm -f "$ERROR_LOG"
                   
           if echo "$KV_LIST" | jq -e ".[] | select(.title == \"$NAME\")" >/dev/null; then
             echo "✅ Database $NAME already exists."
@@ -191,15 +190,14 @@ jobs:
           
           echo "🔍 Checking if the database exists..."
           
-          set +e
-            DB_LIST=$(pnpm wrangler d1 list --json 2>&1)
-            STATUS=$?
-          set -e
-          
-          if [ $STATUS -ne 0 ]; then
-            echo "$DB_LIST"
+          ERROR_LOG=$(mktemp)
+          if ! DB_LIST=$(pnpm wrangler d1 list --json 2>"$ERROR_LOG"); then
+            cat "$ERROR_LOG" >&2
+            rm -f "$ERROR_LOG"
             exit 1
           fi
+          cat "$ERROR_LOG" >&2
+          rm -f "$ERROR_LOG"
           
           if echo "$DB_LIST" | jq -e ".[] | select(.name == \"$NAME\")" >/dev/null; then
             echo "✅ Database $NAME already exists."
