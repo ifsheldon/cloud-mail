@@ -39,6 +39,10 @@
 - [在线演示](https://skymail.ink)<br>
 - [部署文档](https://doc.skymail.ink)<br>
 
+使用 GitHub Actions 部署时，将仓库 Secret 或 Variable 中的 `CF_EMAIL` 设置为 `true` 可启用 Cloudflare 邮件绑定，默认值为 `false`。
+工作流将此设置映射为内部变量 `ENABLE_CF_EMAIL`，以避免与 Cloudflare 凭据变量冲突。
+可通过仓库 Secret 或 Variable 中的 `AI_MODEL` 覆盖默认模型 `@cf/meta/llama-3.1-8b-instruct-fast`。
+
 | ![](/doc/demo/demo1.png) | ![](/doc/demo/demo2.png) |
 |-----------------------|-----------------------|
 | ![](/doc/demo/demo3.png) | ![](/doc/demo/demo4.png) |

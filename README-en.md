@@ -36,6 +36,10 @@ With only one domain, you can create multiple different email addresses, similar
 - [Live Demo](https://skymail.ink)<br>
 - [Deployment Guide](https://doc.skymail.ink/en/)<br>
 
+For GitHub Actions deployment, set the repository secret or variable `CF_EMAIL` to `true` to enable the Cloudflare email binding; the default is `false`.
+The workflow maps this setting to the internal variable `ENABLE_CF_EMAIL` to avoid collisions with Cloudflare credential variables.
+Set the repository secret or variable `AI_MODEL` to override the default model `@cf/meta/llama-3.1-8b-instruct-fast`.
+
 
 | ![](/doc/demo/demo1.png) | ![](/doc/demo/demo2.png) |
 |--------------------------|--------------------------|
